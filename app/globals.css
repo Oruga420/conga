@@ -150,6 +150,7 @@ main {
   padding: 18px 16px 14px;
   box-shadow: 0 8px 22px rgba(15, 75, 145, 0.08);
   position: relative;
+  z-index: 1;
 }
 
 .contact-card::after {
@@ -159,6 +160,8 @@ main {
   border: 1px dashed var(--bright-blue);
   border-radius: 12px;
   opacity: 0.8;
+  pointer-events: none;
+  z-index: 0;
 }
 
 .contact-title {
@@ -205,6 +208,8 @@ main {
   cursor: pointer;
   font-size: 14px;
   transition: transform 180ms ease, box-shadow 180ms ease;
+  position: relative;
+  z-index: 2;
 }
 
 .btn-primary {
