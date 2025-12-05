@@ -1,5 +1,7 @@
 "use client";
 
+import { useCallback, useState } from "react";
+
 const summary =
   "Visionary Software Architect with 15+ years of experience in distributed systems, automation, and platform engineering. Currently focused on architecting foundational GenAI layers for enterprise environments. Expert in bridging the gap between hype and production-ready systems, utilizing GCP, AWS, and Azure. Proven success in driving AI adoption (47% to 97%), reducing operational costs by over $1M, and leading technical strategy for scalable, secure AI platforms. A recognized thought leader dedicated to mentoring teams and fostering community innovation.";
 
@@ -91,11 +93,49 @@ const community = [
 ];
 
 export default function Home() {
-  const handlePrint = () => {
-    if (typeof window !== "undefined") {
-      window.print();
+  const [isDownloading, setIsDownloading] = useState(false);
+
+  const handleDownloadPdf = useCallback(async () => {
+    if (isDownloading) return;
+    setIsDownloading(true);
+    try {
+      const [{ jsPDF }, html2canvas] = await Promise.all([
+        import("jspdf"),
+        import("html2canvas"),
+      ]);
+      const element = document.querySelector(".page");
+      if (!element) return;
+
+      const canvas = await html2canvas.default(element, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: "#ffffff",
+      });
+
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "pt",
+        format: "a4",
+      });
+
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const imgWidth = pageWidth;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      const yPosition = Math.max((pageHeight - imgHeight) / 2, 0);
+
+      pdf.addImage(imgData, "PNG", 0, yPosition, imgWidth, imgHeight);
+      pdf.save("Alejandro-De-La-Mora-Resume.pdf");
+    } catch (error) {
+      console.error("PDF download failed", error);
+      if (typeof window !== "undefined") {
+        window.print();
+      }
+    } finally {
+      setIsDownloading(false);
     }
-  };
+  }, [isDownloading]);
 
   return (
     <main>
@@ -132,8 +172,13 @@ export default function Home() {
                 </li>
               </ul>
               <div className="cta-row">
-                <button className="btn btn-primary" onClick={handlePrint}>
-                  Download PDF
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={handleDownloadPdf}
+                  disabled={isDownloading}
+                >
+                  {isDownloading ? "Preparing..." : "Download PDF"}
                 </button>
               </div>
             </div>
