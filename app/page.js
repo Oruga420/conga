@@ -107,12 +107,12 @@ export default function Home() {
       if (!element) return;
 
       const canvas = await html2canvas.default(element, {
-        scale: 2,
+        scale: 1.4,
         useCORS: true,
         backgroundColor: "#ffffff",
       });
 
-      const imgData = canvas.toDataURL("image/png");
+      const imgData = canvas.toDataURL("image/jpeg", 0.82);
       const pdf = new jsPDF({
         orientation: "portrait",
         unit: "pt",
